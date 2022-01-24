@@ -3,21 +3,22 @@ const mongoosePaginate = require("mongoose-paginate");
 const MessageUtils = require("./../Utils/MessageUtils");
 
 const { Schema } = mongoose;
+const required = [true, MessageUtils.REQUIRED];
 
 const InscriptionSchema = new Schema({
   matricule: {
     type: Number,
-    required: [true, MessageUtils.REQUIRED],
+    required,
   },
   dateInscription: {
     type: Date,
-    required: [true, MessageUtils.REQUIRED],
+    required,
   },
   anneeScolaire: {
     type: Number,
-    required: [true, MessageUtils.REQUIRED],
+    required,
   },
-  niveau: { type: String, required: [true, MessageUtils.REQUIRED] },
+  niveau: { type: String, required },
   mention: { type: { mention: String, code: String, specialisation: String } },
 });
 
