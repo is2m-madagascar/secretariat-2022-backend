@@ -51,27 +51,26 @@ const getPersonne = (req, res) => {
 };
 
 const paginatePersonnes = (req, res) => {
-  /* SearchCriteria */
-  const statut = QueryUtils.createStringQuery(req.query.statut);
-  const nom = QueryUtils.createStringQuery(req.query.nom);
-  const prenoms = QueryUtils.createStringQuery(req.query.prenoms);
-  /* End SearchCriteria*/
 
-  const compile = [
-    { statut },
-    { "nomPrenom.nom": nom },
-    { "nomPrenom.prenoms": prenoms },
-  ];
+  const conditions = [];
+  req.query.statut
+    ? conditions.push({ statut: QueryUtils.regexp(req.query.statut) })
+    : "";
+  req.query.nom
+    ? conditions.push({ "nomPrenom.nom": QueryUtils.regexp(req.query.nom) })
+    : "";
+  req.query.prenoms
+    ? conditions.push({
+        "nomPrenom.prenoms": QueryUtils.regexp(req.query.prenoms),
+      })
+    : "";
 
-  //if no queries, we cannot use $and, so we replace it by {}
-  const searchConditions =
-    QueryUtils.compileQuery(compile).length !== 0
-      ? {
-          $and: QueryUtils.compileQuery(compile),
-        }
-      : {};
+  conditions.length === 0 ? conditions.push({}) : "";
+  console.log(conditions);
 
-  console.log(searchConditions);
+  const searchConditions = {
+    $and: conditions,
+  };
 
   return ResponseHandling.handlePagination(
     req,

@@ -53,27 +53,27 @@ const getInscriptionByID = (req, res) => {
 };
 
 const paginateInscriptions = (req, res) => {
-  /* SearchCriteria*/
-  const matricule = QueryUtils.createNumberQuery(req.query.matricule, "$eq");
-  // anneeScolaire 2020 -> 2020-2021
-  const anneeScolaire_annee1 = QueryUtils.createNumberQuery(
-    req.query.anneeScolaire,
-    "$eq"
-  );
-  /* End SearchCriteria*/
+  const conditions = [];
+  req.query.matricule
+    ? conditions.push({ matricule: { $eq: req.query.matricule } })
+    : "";
+  req.query.anneeScolaire
+    ? conditions.push({ anneeScolaire: { $eq: req.query.anneeScolaire } })
+    : "";
+  req.query.niveau
+    ? conditions.push({ niveau: { $eq: req.query.niveau } })
+    : "";
+  req.query.mention
+    ? conditions.push({ "mention.code": { $eq: req.query.mention } })
+    : "";
 
-  const compile = [{ matricule }];
+  conditions.length === 0 ? conditions.push({}) : "";
 
-  console.log(compile);
+  console.log(conditions);
 
-  const searchConditions =
-    QueryUtils.compileQuery(compile).length !== 0
-      ? {
-          $and: QueryUtils.compileQuery(compile),
-        }
-      : {};
-
-  console.log(searchConditions);
+  const searchConditions = {
+    $and: conditions,
+  };
 
   return ResponseHandling.handlePagination(
     req,
@@ -83,8 +83,32 @@ const paginateInscriptions = (req, res) => {
   );
 };
 
+const deleteInscription = (req, res) => {
+  const condition = { _id: req.params.id };
+  Inscription.findOneAndDelete(condition, (err, inscription) => {
+    QueryUtils.handleCases(
+      err,
+      inscription,
+      () => {
+        return ResponseHandling.handleResponse(
+          inscription,
+          res,
+          MessageUtils.DELETE_OK
+        );
+      },
+      () => {
+        return ResponseHandling.handleError(err, res);
+      },
+      () => {
+        return ResponseHandling.handleNotFound(res);
+      }
+    );
+  });
+};
+
 module.exports = {
   createInscription,
   getInscriptionByID,
   paginateInscriptions,
+  deleteInscription,
 };

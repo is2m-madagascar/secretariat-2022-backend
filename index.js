@@ -66,6 +66,7 @@ app.delete("/personne/:matricule", personneService.deletePersonne);
 app.post("/inscription", inscriptionService.createInscription);
 app.get("/inscription/:id", inscriptionService.getInscriptionByID);
 app.get("/inscriptions", inscriptionService.paginateInscriptions);
+app.delete("/inscription/:id", inscriptionService.deleteInscription);
 
 /* Ecolage endpoints */
 
