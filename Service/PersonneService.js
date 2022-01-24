@@ -51,12 +51,12 @@ const getPersonne = (req, res) => {
 };
 
 const paginatePersonnes = (req, res) => {
-  const page = req.query.page < 1 ? 1 : req.query.page || 1;
-  //page size
-  const limit = req.query.pageSize || process.env.PAGE_SIZE || 10;
-  const statut = QueryUtils.createQuery(req.query.statut);
-  const nom = QueryUtils.createQuery(req.query.nom);
-  const prenoms = QueryUtils.createQuery(req.query.prenoms);
+  /* SearchCriteria */
+  const statut = QueryUtils.createStringQuery(req.query.statut);
+  const nom = QueryUtils.createStringQuery(req.query.nom);
+  const prenoms = QueryUtils.createStringQuery(req.query.prenoms);
+  /* End SearchCriteria*/
+
   const compile = [
     { statut },
     { "nomPrenom.nom": nom },
@@ -73,24 +73,12 @@ const paginatePersonnes = (req, res) => {
 
   console.log(searchConditions);
 
-  Personne.paginate(searchConditions, { page, limit })
-    .then(function (result) {
-      const totalElements = result.total;
-      const pages = result.pages;
-      const message = {
-        pagination: {
-          totalElements,
-          pages,
-          pageSize: parseInt(limit),
-          page: parseInt(page),
-        },
-        statusMessage: MessageUtils.GET_OK,
-      };
-      return ResponseHandling.handleResponse(result.docs, res, message);
-    })
-    .catch((err) => {
-      return ResponseHandling.handleError(err, res);
-    });
+  return ResponseHandling.handlePagination(
+    req,
+    res,
+    Personne,
+    searchConditions
+  );
 };
 
 const updatePersonne = (req, res) => {

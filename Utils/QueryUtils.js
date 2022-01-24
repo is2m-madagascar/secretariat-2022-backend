@@ -1,12 +1,22 @@
-const MessageUtils = require("./MessageUtils");
-
 /**
- * req.query.toto -> retourn le RegExp "commence par" la valeur de req.query.toto
- * @param {*} selector
+ * retourne le RegExp "commence par" la valeur de req.query.toto
+ * @param {String} selector début du mot à rechercher
  * @returns regexp ou null
  */
-const createQuery = (selector) => {
+const createStringQuery = (selector) => {
   return selector ? new RegExp("^" + selector) : null;
+};
+
+/**
+ * retourne la comparaison entre un nombre et une valeur enregistré dans la base de données
+ * @param {Number} value la valeur à comparer
+ * @param {String} operator l'opération de comparaison $eq -> equals , $lt -> less than , etc -> see mongoose documentation
+ * @returns l'opération de comparaison
+ */
+const createNumberQuery = (value, operator) => {
+  const keyValue = {};
+  keyValue[operator] = value;
+  return keyValue;
 };
 
 /**
@@ -21,8 +31,9 @@ const compileQuery = (queryTable) => {
     const value = element[key];
     const keyValue = {};
     keyValue[key] = value;
+    console.log("Eto -> " + key + "-> " + keyValue.value);
     //verifie si la valeur n'est pas null et l'ajoute à un nouveau tableau
-    value ? table.push(keyValue) : "";
+    keyValue.value ? table.push(keyValue) : "";
   });
   return table;
 };
@@ -45,4 +56,9 @@ const handleCases = (
   }
 };
 
-module.exports = { createQuery, compileQuery, handleCases };
+module.exports = {
+  createStringQuery,
+  createNumberQuery,
+  compileQuery,
+  handleCases,
+};

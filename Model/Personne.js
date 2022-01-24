@@ -1,24 +1,25 @@
 const mongoose = require("mongoose");
-var mongoosePaginate = require("mongoose-paginate");
+const mongoosePaginate = require("mongoose-paginate");
+const MessageUtils = require("./../Utils/MessageUtils");
 
 const { Schema } = mongoose;
 
 const PersonneSchema = new Schema({
   matricule: {
     type: Number,
-    required: [true, "Matricule is required"],
+    required: [true, MessageUtils.REQUIRED],
     unique: true,
     min: 1,
   },
 
   nomPrenom: {
     type: { nom: String, prenoms: String },
-    required: [true, "Nom and Prenoms are required"],
+    required: [true, MessageUtils.REQUIRED],
   },
 
   statut: {
     type: String,
-    required: [true, "Statut is required"],
+    required: [true, MessageUtils.REQUIRED],
   },
 });
 

@@ -1,7 +1,9 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
+const variablesService = require("./Service/VariablesService");
 const personneService = require("./Service/PersonneService");
+const inscriptionService = require("./Service/InscriptionService");
 
 /* config app*/
 const app = express();
@@ -50,6 +52,9 @@ const connectToMongo = (uri, options) => {
 
 connectToMongo(uri, options);
 
+/* Variables */
+app.get("/variables/:variable", variablesService.getVariables);
+
 /* Personne endpoints */
 app.post("/personne", personneService.createPersonne);
 app.get("/personne/:matricule", personneService.getPersonne);
@@ -58,12 +63,17 @@ app.put("/personne", personneService.updatePersonne);
 app.delete("/personne/:matricule", personneService.deletePersonne);
 
 /* Inscription endpoints*/
+app.post("/inscription", inscriptionService.createInscription);
+app.get("/inscription/:id", inscriptionService.getInscriptionByID);
+app.get("/inscriptions", inscriptionService.paginateInscriptions);
 
 /* Ecolage endpoints */
 
 /* Cours endpoints */
 
 /* Facturation endpoints */
+
+/* Embauche */
 
 app.listen(port, () => {
   console.log(`Application démarré sur le port ${port}`);

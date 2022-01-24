@@ -33,4 +33,36 @@ const handleNotFound = (res, message) => {
   return res.status(404).json(response);
 };
 
-module.exports = { handleError, handleResponse, handleNotFound };
+const handlePagination = (req, res, Model, searchConditrions) => {
+  /* Pagination */
+  const page = req.query.page < 1 ? 1 : req.query.page || 1;
+  //page size
+  const limit = req.query.pageSize || process.env.PAGE_SIZE || 10;
+  /* End pagination*/
+
+  Model.paginate(searchConditrions, { page, limit })
+    .then((result) => {
+      const totalElements = result.total;
+      const pages = result.pages;
+      const message = {
+        pagination: {
+          totalElements,
+          pages,
+          pageSize: parseInt(limit),
+          page: parseInt(page),
+        },
+        statusMessage: MessageUtils.GET_OK,
+      };
+      return handleResponse(result.docs, res, message);
+    })
+    .catch((err) => {
+      return handleError(err, res);
+    });
+};
+
+module.exports = {
+  handleError,
+  handleResponse,
+  handleNotFound,
+  handlePagination,
+};
