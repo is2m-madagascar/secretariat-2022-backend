@@ -1,10 +1,8 @@
 const Inscription = require("./../Model/Inscriptions");
-const Ecolage = require("./../Model/Ecolage");
 const ResponseHandling = require("./../Utils/ResponseHandling");
 const MessageUtils = require("./../Utils/MessageUtils");
 const QueryUtils = require("./../Utils/QueryUtils");
 const variables = require("./../Config/Variables");
-const ecolageRepository = require("./../Repository/EcolageRepository");
 
 const createInscription = (req, res) => {
   const inscription = new Inscription();
@@ -14,6 +12,13 @@ const createInscription = (req, res) => {
   inscription.anneeScolaire = req.body.anneeScolaire;
   inscription.niveau = req.body.niveau;
   inscription.mention = req.body.mention;
+  inscription.ecolage = {
+    montantTotal: {
+      fraisInsc: variables.fraisInscription,
+      fraisFormation: variables.fraisScolarite[inscription.niveau],
+    },
+    paiementsEffectues: [],
+  };
 
   console.log("Inscription reçu");
   console.log(inscription);
@@ -22,16 +27,6 @@ const createInscription = (req, res) => {
     if (err) {
       return ResponseHandling.handleError(err, res);
     } else {
-      // Crée automatiquement l'écolage correspondant
-      const ecolage = new Ecolage();
-      ecolage.matricule = inscription.matricule;
-      ecolage.anneeScolaire = inscription.anneeScolaire;
-      ecolage.montantTotal = {
-        fraisInsc: variables.fraisInscription,
-        fraisFormation: variables.fraisScolarite[inscription.niveau],
-      };
-      ecolageRepository.saveEcolage(inscription, res);
-
       return ResponseHandling.handleResponse(
         inscription,
         res,

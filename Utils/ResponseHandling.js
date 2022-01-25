@@ -22,7 +22,7 @@ const handleResponse = (data, res, message) => {
   return res.status(200).json(response);
 };
 
-const handleNotFound = (res, message) => {
+const handleNotFound = (res) => {
   const response = new Response.ApiResponse({
     data: [],
     errors: ["Ressource not found"],

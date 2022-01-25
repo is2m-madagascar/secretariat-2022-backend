@@ -35,15 +35,13 @@ app.get("/inscriptions", inscriptionService.paginateInscriptions);
 app.delete("/inscription/:id", inscriptionService.deleteInscription);
 
 /* Ecolage endpoints */
-app.get("/ecolage/:id", ecolageService.getEcolageByID);
-app.get("/ecolages", ecolageService.getEcolages);
-app.put("/ecolage/:id", ecolageService.addPayement);
+app.put("/inscription/payerEcolage/:id", ecolageService.payerEcolage);
 
 /* Cours endpoints */
 
 /* Facturation endpoints */
 
-/* Embauche */
+/* Embauche endpoints*/
 
 const port = process.env.APP_PORT || 8010;
 

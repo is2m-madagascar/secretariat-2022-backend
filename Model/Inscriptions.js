@@ -20,6 +20,25 @@ const InscriptionSchema = new Schema({
   },
   niveau: { type: String, required },
   mention: { type: { mention: String, code: String, specialisation: String } },
+  ecolage: {
+    type: {
+      montantTotal: {
+        type: {
+          fraisInsc: { type: Number },
+          fraisFormation: { type: Number },
+        },
+      },
+      paiementsEffectues: {
+        type: [
+          {
+            montant: { type: [Number] },
+            datePaiement: { type: Date },
+            motif: { type: [String] },
+          },
+        ],
+      },
+    },
+  },
 });
 
 InscriptionSchema.plugin(mongoosePaginate);
