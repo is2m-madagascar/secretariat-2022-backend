@@ -24,15 +24,7 @@ const createInscription = (req, res) => {
   console.log(inscription);
 
   inscription.save((err) => {
-    if (err) {
-      return ResponseHandling.handleError(err, res);
-    } else {
-      return ResponseHandling.handleResponse(
-        inscription,
-        res,
-        MessageUtils.POST_OK
-      );
-    }
+    QueryUtils.handlePostSave(err, res, inscription);
   });
 };
 

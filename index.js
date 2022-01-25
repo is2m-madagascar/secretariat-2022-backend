@@ -6,6 +6,7 @@ const variablesService = require("./Service/VariablesService");
 const personneService = require("./Service/PersonneService");
 const inscriptionService = require("./Service/InscriptionService");
 const ecolageService = require("./Service/EcolageService");
+const enseignementService = require("./Service/EnseignementService");
 
 /* config app*/
 const app = express();
@@ -37,11 +38,16 @@ app.delete("/inscription/:id", inscriptionService.deleteInscription);
 /* Ecolage endpoints */
 app.put("/inscription/payerEcolage/:id", ecolageService.payerEcolage);
 
+/* Enseignement endpoints*/
+app.post("/enseignement", enseignementService.createEnseignement);
+app.post("/enseignements", enseignementService.importEnseignements);
+app.get("/enseignement/:id", enseignementService.getEnseignementById);
+app.get("/enseignements", enseignementService.getEnseignements);
+app.put("/enseignement", enseignementService.updateEnseignement);
+
 /* Cours endpoints */
 
 /* Facturation endpoints */
-
-/* Embauche endpoints*/
 
 const port = process.env.APP_PORT || 8010;
 

@@ -1,3 +1,6 @@
+const ResponseHandling = require("./ResponseHandling");
+const MessageUtils = require("./MessageUtils");
+
 /**
  * retourne le RegExp "commence par" la valeur de req.query.toto
  * @param {String} selector début du mot à rechercher
@@ -25,6 +28,14 @@ const handleCases = (
   }
 };
 
+const handlePostSave = (err, res, element) => {
+  if (err) {
+    return ResponseHandling.handleError(err, res);
+  } else {
+    return ResponseHandling.handleResponse(element, res, MessageUtils.POST_OK);
+  }
+};
+
 const setCorsPolicy = (_, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
@@ -43,4 +54,5 @@ module.exports = {
   regexp,
   handleCases,
   setCorsPolicy,
+  handlePostSave,
 };

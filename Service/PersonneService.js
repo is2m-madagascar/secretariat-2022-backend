@@ -14,15 +14,7 @@ const createPersonne = (req, res) => {
   console.log(personne);
 
   personne.save((err) => {
-    if (err) {
-      return ResponseHandling.handleError(err, res);
-    } else {
-      return ResponseHandling.handleResponse(
-        personne,
-        res,
-        MessageUtils.POST_OK
-      );
-    }
+    QueryUtils.handlePostSave(err, res, personne);
   });
 };
 
@@ -51,7 +43,6 @@ const getPersonne = (req, res) => {
 };
 
 const paginatePersonnes = (req, res) => {
-
   const conditions = [];
   req.query.statut
     ? conditions.push({ statut: QueryUtils.regexp(req.query.statut) })
