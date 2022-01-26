@@ -19,8 +19,16 @@ const EnseignementSchema = new Schema({
     required,
   }, // MI
   elementConstitutif: { type: String, required }, // Algebre 1
-  volumeHoraire: { type: Number, required }, //15
-  matriculeEnseignant: { type: Number },
+  volumeHoraire: {
+    type: {
+      days: { type: Number, default: 0 },
+      hours: { type: Number, default: 0 },
+      minutes: { type: Number, default: 0 },
+    },
+    required,
+    default: { days: 0, hours: 0, minutes: 0 },
+  }, //15
+  enseignant: { type: mongoose.Schema.Types.ObjectId, ref: "Personne" },
 });
 
 EnseignementSchema.plugin(mongoosePaginate);

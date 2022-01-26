@@ -3,7 +3,7 @@ const ResponseHandling = require("../Utils/ResponseHandling");
 const QueryUtils = require("../Utils/QueryUtils");
 const MessageUtils = require("../Utils/MessageUtils");
 
-const createPersonne = (req, res) => {
+const createPersonne = async (req, res) => {
   const personne = new Personne();
 
   personne.matricule = req.body.matricule;
@@ -13,37 +13,34 @@ const createPersonne = (req, res) => {
   console.log("Personne reçu");
   console.log(personne);
 
-  personne.save((err) => {
-    QueryUtils.handlePostSave(err, res, personne);
-  });
+  try {
+    await personne.save();
+    return ResponseHandling.handleResponse(personne, res, MessageUtils.POST_OK);
+  } catch (e) {
+    return ResponseHandling.handleError(e, res, MessageUtils.ERROR);
+  }
 };
 
-const getPersonne = (req, res) => {
+const getPersonne = async (req, res) => {
   const condition = { matricule: req.params.matricule };
 
-  Personne.findOne(condition, (err, personne) => {
-    QueryUtils.handleCases(
-      err,
-      personne,
-      () => {
-        return ResponseHandling.handleResponse(
-          personne,
-          res,
-          MessageUtils.GET_OK
-        );
-      },
-      () => {
-        return ResponseHandling.handleError(err, res);
-      },
-      () => {
-        return ResponseHandling.handleNotFound(res);
-      }
-    );
-  });
+  try {
+    const personne = await Personne.findOne(condition);
+    return personne
+      ? ResponseHandling.handleResponse(personne, res, MessageUtils.GET_OK)
+      : ResponseHandling.handleNotFound(res);
+  } catch (e) {
+    return ResponseHandling.handleError(e, res, MessageUtils.ERROR);
+  }
 };
 
-const paginatePersonnes = (req, res) => {
+const paginatePersonnes = async (req, res) => {
   const conditions = [];
+
+  const page = req.query.page < 1 ? 1 : req.query.page || 1;
+  //page size
+  const limit = req.query.pageSize || process.env.PAGE_SIZE || 10;
+
   req.query.statut
     ? conditions.push({ statut: QueryUtils.regexp(req.query.statut) })
     : "";
@@ -63,61 +60,54 @@ const paginatePersonnes = (req, res) => {
     $and: conditions,
   };
 
-  return ResponseHandling.handlePagination(
-    req,
-    res,
-    Personne,
-    searchConditions
-  );
+  try {
+    const personnes = await Personne.paginate(searchConditions, {
+      page,
+      limit,
+    });
+    const message = {
+      pagination: {
+        totalElements: personnes.total,
+        pages: personnes.pages,
+        pageSize: parseInt(limit),
+        page: parseInt(page),
+      },
+      statusMessage: MessageUtils.GET_OK,
+    };
+
+    return personnes
+      ? ResponseHandling.handleResponse(personnes.docs, res, message)
+      : ResponseHandling.handleNotFound(res);
+  } catch (e) {
+    return ResponseHandling.handleError(e, res, MessageUtils.ERROR);
+  }
 };
 
-const updatePersonne = (req, res) => {
+const updatePersonne = async (req, res) => {
   const condition = { matricule: req.body.matricule };
   const opts = { runValidators: true, new: true };
 
-  Personne.findOneAndUpdate(condition, req.body, opts, (err, personne) => {
-    QueryUtils.handleCases(
-      err,
-      personne,
-      () => {
-        return ResponseHandling.handleResponse(
-          personne,
-          res,
-          MessageUtils.PUT_OK
-        );
-      },
-      () => {
-        return ResponseHandling.handleError(err, res);
-      },
-      () => {
-        return ResponseHandling.handleNotFound(res);
-      }
-    );
-  });
+  try {
+    const personne = await Personne.findOneAndUpdate(condition, req.body, opts);
+    return personne
+      ? ResponseHandling.handleResponse(personne, res, MessageUtils.PUT_OK)
+      : ResponseHandling.handleNotFound(res);
+  } catch (e) {
+    return ResponseHandling.handleError(e, res);
+  }
 };
 
-const deletePersonne = (req, res) => {
+const deletePersonne = async (req, res) => {
   const condition = { matricule: req.params.matricule };
 
-  Personne.findOneAndDelete(condition, (err, personne) => {
-    QueryUtils.handleCases(
-      err,
-      personne,
-      () => {
-        return ResponseHandling.handleResponse(
-          personne,
-          res,
-          MessageUtils.DELETE_OK
-        );
-      },
-      () => {
-        return ResponseHandling.handleError(err, res);
-      },
-      () => {
-        return ResponseHandling.handleNotFound(res);
-      }
-    );
-  });
+  try {
+    const personne = await Personne.findOneAndDelete(condition);
+    return personne
+      ? ResponseHandling.handleResponse(personne, res, MessageUtils.DELETE_OK)
+      : ResponseHandling.handleNotFound(res);
+  } catch (e) {
+    return ResponseHandling.handleError(e, res);
+  }
 };
 
 module.exports = {

@@ -4,7 +4,7 @@ const MessageUtils = require("./../Utils/MessageUtils");
 const QueryUtils = require("./../Utils/QueryUtils");
 const variables = require("./../Config/Variables");
 
-const createInscription = (req, res) => {
+const createInscription = async (req, res) => {
   const inscription = new Inscription();
 
   inscription.matricule = req.body.matricule;
@@ -23,37 +23,38 @@ const createInscription = (req, res) => {
   console.log("Inscription reçu");
   console.log(inscription);
 
-  inscription.save((err) => {
-    QueryUtils.handlePostSave(err, res, inscription);
-  });
+  try {
+    await inscription.save();
+    return ResponseHandling.handleResponse(
+      inscription,
+      res,
+      MessageUtils.POST_OK
+    );
+  } catch (e) {
+    return ResponseHandling.handleError(e, res, MessageUtils.ERROR);
+  }
 };
 
-const getInscriptionByID = (req, res) => {
+const getInscriptionByID = async (req, res) => {
   const condition = { _id: req.params.id };
 
-  Inscription.findOne(condition, (err, inscription) => {
-    QueryUtils.handleCases(
-      err,
-      inscription,
-      () => {
-        return ResponseHandling.handleResponse(
-          inscription,
-          res,
-          MessageUtils.GET_OK
-        );
-      },
-      () => {
-        return ResponseHandling.handleError(err, res);
-      },
-      () => {
-        return ResponseHandling.handleNotFound(res);
-      }
-    );
-  });
+  try {
+    const inscription = await Inscription.findOne(condition);
+    return inscription
+      ? ResponseHandling.handleResponse(inscription, res, MessageUtils.GET_OK)
+      : ResponseHandling.handleNotFound(res);
+  } catch (e) {
+    return ResponseHandling.handleError(e, res);
+  }
 };
 
-const paginateInscriptions = (req, res) => {
+const paginateInscriptions = async (req, res) => {
   const conditions = [];
+
+  const page = req.query.page < 1 ? 1 : req.query.page || 1;
+  //page size
+  const limit = req.query.pageSize || process.env.PAGE_SIZE || 10;
+
   req.query.matricule
     ? conditions.push({ matricule: { $eq: req.query.matricule } })
     : "";
@@ -75,35 +76,45 @@ const paginateInscriptions = (req, res) => {
     $and: conditions,
   };
 
-  return ResponseHandling.handlePagination(
-    req,
-    res,
-    Inscription,
-    searchConditions
-  );
+  try {
+    const inscription = await Inscription.paginate(searchConditions, {
+      limit,
+      page,
+    });
+
+    const message = {
+      pagination: {
+        totalElements: inscription.total,
+        pages: inscription.pages,
+        pageSize: parseInt(limit),
+        page: parseInt(page),
+      },
+      statusMessage: MessageUtils.GET_OK,
+    };
+
+    return inscription
+      ? ResponseHandling.handleResponse(inscription, res, message)
+      : ResponseHandling.handleNotFound(res);
+  } catch (e) {
+    return ResponseHandling.handleError(e, res, MessageUtils.ERROR);
+  }
 };
 
-const deleteInscription = (req, res) => {
+const deleteInscription = async (req, res) => {
   const condition = { _id: req.params.id };
-  Inscription.findOneAndDelete(condition, (err, inscription) => {
-    QueryUtils.handleCases(
-      err,
-      inscription,
-      () => {
-        return ResponseHandling.handleResponse(
+
+  try {
+    const inscription = await Inscription.findOneAndDelete(condition);
+    return inscription
+      ? ResponseHandling.handleResponse(
           inscription,
           res,
           MessageUtils.DELETE_OK
-        );
-      },
-      () => {
-        return ResponseHandling.handleError(err, res);
-      },
-      () => {
-        return ResponseHandling.handleNotFound(res);
-      }
-    );
-  });
+        )
+      : ResponseHandling.handleNotFound(res);
+  } catch (e) {
+    return ResponseHandling.handleError(e, res);
+  }
 };
 
 module.exports = {

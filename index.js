@@ -7,6 +7,7 @@ const personneService = require("./Service/PersonneService");
 const inscriptionService = require("./Service/InscriptionService");
 const ecolageService = require("./Service/EcolageService");
 const enseignementService = require("./Service/EnseignementService");
+const coursService = require("./Service/CoursService");
 
 /* config app*/
 const app = express();
@@ -46,6 +47,10 @@ app.get("/enseignements", enseignementService.getEnseignements);
 app.put("/enseignement", enseignementService.updateEnseignement);
 
 /* Cours endpoints */
+app.post("/cours", coursService.ouvrirCours);
+app.put("/cours/:id", coursService.fermerCours);
+app.get("/cours/:id", coursService.getCoursById);
+app.get("/cours", coursService.getCours);
 
 /* Facturation endpoints */
 

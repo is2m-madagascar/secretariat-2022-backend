@@ -1,11 +1,11 @@
 const Response = require("./../Model/ApiResponse");
 const MessageUtils = require("./MessageUtils");
 
-const handleError = (err, res) => {
+const handleError = (err, res, message) => {
   const response = new Response.ApiResponse({
     data: [],
-    errors: [err.message],
-    message: MessageUtils.ERROR,
+    errors: [err.message || err],
+    message: message || MessageUtils.ERROR,
   });
   console.log(response);
   return res.status(500).json(response);
