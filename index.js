@@ -8,6 +8,7 @@ const inscriptionService = require("./Service/InscriptionService");
 const ecolageService = require("./Service/EcolageService");
 const enseignementService = require("./Service/EnseignementService");
 const coursService = require("./Service/CoursService");
+const factureService = require("./Service/FacturationService");
 
 /* config app*/
 const app = express();
@@ -53,6 +54,8 @@ app.get("/cours/:id", coursService.getCoursById);
 app.get("/cours", coursService.getCours);
 
 /* Facturation endpoints */
+app.get("/facture/:id", factureService.getFactureByID);
+app.get("/factures", factureService.getFactures);
 
 const port = process.env.APP_PORT || 8010;
 

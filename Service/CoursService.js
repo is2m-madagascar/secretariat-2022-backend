@@ -1,9 +1,10 @@
 const Cours = require("./../Model/Cours");
+const facturationRepository = require("./../Repository/FacturationRepository");
 const Enseignement = require("./../Model/Enseignement");
-const QueryUtils = require("./../Utils/QueryUtils");
 const ResponseHandling = require("./../Utils/ResponseHandling");
 const MessageUtils = require("./../Utils/MessageUtils");
 const moment = require("moment");
+const QueryRequest = require("./../Utils/QueryRequest");
 
 const ouvrirCours = async (req, res) => {
   const newCours = new Cours();
@@ -23,148 +24,122 @@ const ouvrirCours = async (req, res) => {
       const enseignement = await Enseignement.findOne({
         _id: newCours.enseignement,
       });
+      if (!enseignement) {
+        return ResponseHandling.handleNotFound(res);
+      }
 
       newCours.enseignant = enseignement._id;
 
-      await newCours.save();
-      return res.status(200).json({ message: "afaka" });
+      //TODO transactions
+      const { cours, facture } =
+        await facturationRepository.createFactureAndCours(newCours, req);
+      //end transactions
+
+      await cours.save();
+
+      const showCours = await Cours.findOne({ cours })
+        .populate("enseignement")
+        .populate("enseignant");
+
+      //console.log({ cours, facture });
+
+      return ResponseHandling.handleResponse(
+        showCours,
+        res,
+        MessageUtils.POST_OK
+      );
     } catch (e) {
-      console.log(catched);
-      return res.status(500).json({ message: e.message });
+      return ResponseHandling.handleError(e, res);
     }
   } else {
     return res.status(500).json({
       message: `Course ${cours.enseignement.elementConstitutif} is under achievement`,
     });
   }
-
-  /*Cours.findOne(condition)
-    .populate({ path: "enseignement", model: "Enseignement" })
-    .exec((err, cours) => {
-      QueryUtils.handleCases(
-        err,
-        cours,
-        () => {
-          //err
-
-          return ResponseHandling.handleError(
-            `Course from ${newCours.enseignement_id} is under achievement at ${cours._id}`,
-            res,
-            "A course is under achievement"
-          );
-        },
-        () => {
-          //err
-          return ResponseHandling.handleError(err, res);
-        },
-        () => {
-          //ok
-          console.log("cours reçu");
-          console.log(newCours);
-
-          newCours.save((err) => {
-            QueryUtils.handlePostSave(err, res, newCours);
-          });
-        }
-      );
-    });*/
 };
 
-const fermerCours = (req, res) => {
-  const condition = { _id: req.params.id };
+const fermerCours = async (req, res) => {
+  try {
+    const condition = { _id: req.params.id };
+    const cours = await Cours.findOne(condition);
 
-  Cours.findOne(condition, (err, cours) => {
-    QueryUtils.handleCases(
-      err,
-      cours,
-      () => {
-        if (cours.fin) {
-          return ResponseHandling.handleError(err, res);
-        }
-        cours.fin = new Date();
-        const momentFin = moment(cours.fin);
-        const momentDebut = moment(cours.debut);
+    if (!cours) {
+      return ResponseHandling.handleNotFound(res);
+    }
 
-        const duree = moment.duration(momentFin.subtract(momentDebut));
+    if (cours.fin) {
+      return ResponseHandling.handleError(err, res);
+    } else {
+      cours.fin = new Date();
+      const momentFin = moment(cours.fin);
+      const momentDebut = moment(cours.debut);
 
-        cours.volumeConsomme = {};
+      const duree = moment.duration(momentFin.subtract(momentDebut));
 
-        cours.volumeConsomme.days = duree.days();
-        cours.volumeConsomme.hours = duree.hours();
-        cours.volumeConsomme.minutes = duree.minutes();
-        cours.closed = true;
+      cours.volumeConsomme = {};
+      cours.volumeConsomme.days = duree.days();
+      cours.volumeConsomme.hours = duree.hours();
+      cours.volumeConsomme.minutes = duree.minutes();
+      cours.closed = true;
 
-        const condition = { _id: cours._id };
-        const opts = { runValidators: true, new: true };
+      const opts = { runValidators: true, new: true };
 
-        Cours.findOneAndUpdate(condition, cours, opts, (err, cours) => {
-          QueryUtils.handleCases(
-            err,
-            cours,
-            () => {
-              return ResponseHandling.handleResponse(
-                cours,
-                res,
-                MessageUtils.PUT_OK
-              );
-            },
-            () => {
-              return ResponseHandling.handleError(err, res);
-            },
-            () => {
-              return ResponseHandling.handleNotFound(res);
-            }
-          );
-        });
-      },
-      () => {
-        return ResponseHandling.handleError(err, res);
-      },
-      () => {
-        return ResponseHandling.handleNotFound(res);
-      }
-    );
-  });
+      const updatedCours = await Cours.findOneAndUpdate(condition, cours, opts);
+      return ResponseHandling.handleResponse(
+        updatedCours,
+        res,
+        MessageUtils.PUT_OK
+      );
+    }
+  } catch (e) {
+    return ResponseHandling.handleError(e, res, MessageUtils.ERROR);
+  }
 };
 
 const getCoursById = async (req, res) => {
   const condition = { _id: req.params.id };
 
-  const cours = await Cours.findOne(condition)
-    .populate("enseignement")
-    .populate("enseignant");
-  return res.status(200).json(cours);
-  /*QueryUtils.handleCases(
-    "No err",
-    cours,
-    () => {
-      return ResponseHandling.handleResponse(cours, res, MessageUtils.GET_OK);
-    },
-    () => {
-      return ResponseHandling.handleError("No err", res);
-    },
-    () => {
-      return ResponseHandling.handleNotFound(res);
-    }
-  );*/
+  try {
+    const cours = await Cours.findOne(condition)
+      .populate("enseignement")
+      .populate("enseignant");
+    return ResponseHandling.handleResponse(cours, res, MessageUtils.GET_OK);
+  } catch (e) {
+    return ResponseHandling.handleError(e);
+  }
 };
 
-const getCours = (req, res) => {
-  const conditions = [];
+const getCours = async (req, res) => {
+  const { searchConditions, page, limit } =
+    QueryRequest.handleQueryRequest(req);
 
-  req.query.enseignement_id
-    ? conditions.push({ enseignement_id: { $eq: req.query.enseignement_id } })
-    : "";
+  try {
+    const cours = await Cours.paginate(searchConditions, { limit, page });
 
-  conditions.length === 0 ? conditions.push({}) : "";
+    const message = {
+      pagination: {
+        totalElements: cours.total,
+        pages: cours.pages,
+        pageSize: parseInt(limit),
+        page: parseInt(page),
+      },
+      statusMessage: MessageUtils.GET_OK,
+    };
 
-  console.log(conditions);
+    const newCours = await Promise.all(
+      cours.docs.map(async (element) => {
+        const cours = await Cours.findOne(element)
+          .populate("enseignement")
+          .populate("enseignant");
 
-  const searchConditions = {
-    $and: conditions,
-  };
+        return cours;
+      })
+    );
 
-  return ResponseHandling.handlePagination(req, res, Cours, searchConditions);
+    return ResponseHandling.handleResponse(newCours, res, message);
+  } catch (e) {
+    return ResponseHandling.handleError(e, res, MessageUtils.ERROR);
+  }
 };
 
 module.exports = { ouvrirCours, fermerCours, getCoursById, getCours };

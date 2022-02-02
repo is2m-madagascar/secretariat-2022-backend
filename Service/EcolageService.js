@@ -1,5 +1,4 @@
 const Inscription = require("./../Model/Inscriptions");
-const QueryUtils = require("./../Utils/QueryUtils");
 const ResponseHandling = require("./../Utils/ResponseHandling");
 const MessageUtils = require("./../Utils/MessageUtils");
 

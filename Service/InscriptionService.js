@@ -1,13 +1,14 @@
 const Inscription = require("./../Model/Inscriptions");
+const Personne = require("./../Model/Personne");
 const ResponseHandling = require("./../Utils/ResponseHandling");
 const MessageUtils = require("./../Utils/MessageUtils");
-const QueryUtils = require("./../Utils/QueryUtils");
 const variables = require("./../Config/Variables");
+const QueryRequest = require("./../Utils/QueryRequest");
 
 const createInscription = async (req, res) => {
   const inscription = new Inscription();
 
-  inscription.matricule = req.body.matricule;
+  //inscription.matricule = req.body.matricule;
   inscription.dateInscription = new Date();
   inscription.anneeScolaire = req.body.anneeScolaire;
   inscription.niveau = req.body.niveau;
@@ -19,14 +20,29 @@ const createInscription = async (req, res) => {
     },
     paiementsEffectues: [],
   };
-
   console.log("Inscription reçu");
   console.log(inscription);
-
   try {
+    const etudiant = await Personne.findOne({ matricule: req.body.matricule });
+
+    if (!etudiant) {
+      return ResponseHandling.handleError(err, res, "Etudiant not found");
+    }
+
+    if (etudiant.statut === "Etudiant") {
+      return ResponseHandling.handleError(err, res, "Personne is not student");
+    }
+
+    inscription.etudiant = etudiant._id;
+
     await inscription.save();
+
+    const inscriptionSaved = await Inscription.findOne(inscription).populate(
+      "etudiant"
+    );
+
     return ResponseHandling.handleResponse(
-      inscription,
+      inscriptionSaved,
       res,
       MessageUtils.POST_OK
     );
@@ -39,7 +55,9 @@ const getInscriptionByID = async (req, res) => {
   const condition = { _id: req.params.id };
 
   try {
-    const inscription = await Inscription.findOne(condition);
+    const inscription = await Inscription.findOne(condition).populate(
+      "etudiant"
+    );
     return inscription
       ? ResponseHandling.handleResponse(inscription, res, MessageUtils.GET_OK)
       : ResponseHandling.handleNotFound(res);
@@ -49,32 +67,8 @@ const getInscriptionByID = async (req, res) => {
 };
 
 const paginateInscriptions = async (req, res) => {
-  const conditions = [];
-
-  const page = req.query.page < 1 ? 1 : req.query.page || 1;
-  //page size
-  const limit = req.query.pageSize || process.env.PAGE_SIZE || 10;
-
-  req.query.matricule
-    ? conditions.push({ matricule: { $eq: req.query.matricule } })
-    : "";
-  req.query.anneeScolaire
-    ? conditions.push({ anneeScolaire: { $eq: req.query.anneeScolaire } })
-    : "";
-  req.query.niveau
-    ? conditions.push({ niveau: { $eq: req.query.niveau } })
-    : "";
-  req.query.mention
-    ? conditions.push({ "mention.code": { $eq: req.query.mention } })
-    : "";
-
-  conditions.length === 0 ? conditions.push({}) : "";
-
-  console.log(conditions);
-
-  const searchConditions = {
-    $and: conditions,
-  };
+  const { searchConditions, page, limit } =
+    QueryRequest.handleQueryRequest(req);
 
   try {
     const inscription = await Inscription.paginate(searchConditions, {
@@ -92,8 +86,14 @@ const paginateInscriptions = async (req, res) => {
       statusMessage: MessageUtils.GET_OK,
     };
 
+    const newInsc = await Promise.all(
+      inscription.docs.map(async (element) => {
+        await element.populate("etudiant");
+      })
+    );
+
     return inscription
-      ? ResponseHandling.handleResponse(inscription, res, message)
+      ? ResponseHandling.handleResponse(newInsc, res, message)
       : ResponseHandling.handleNotFound(res);
   } catch (e) {
     return ResponseHandling.handleError(e, res, MessageUtils.ERROR);
@@ -104,7 +104,9 @@ const deleteInscription = async (req, res) => {
   const condition = { _id: req.params.id };
 
   try {
-    const inscription = await Inscription.findOneAndDelete(condition);
+    const inscription = await Inscription.findOneAndDelete(condition).populate(
+      "etudiant"
+    );
     return inscription
       ? ResponseHandling.handleResponse(
           inscription,

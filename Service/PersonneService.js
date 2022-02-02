@@ -1,7 +1,7 @@
 const Personne = require("../Model/Personne");
 const ResponseHandling = require("../Utils/ResponseHandling");
-const QueryUtils = require("../Utils/QueryUtils");
 const MessageUtils = require("../Utils/MessageUtils");
+const QueryRequest = require("./../Utils/QueryRequest");
 
 const createPersonne = async (req, res) => {
   const personne = new Personne();
@@ -35,30 +35,8 @@ const getPersonne = async (req, res) => {
 };
 
 const paginatePersonnes = async (req, res) => {
-  const conditions = [];
-
-  const page = req.query.page < 1 ? 1 : req.query.page || 1;
-  //page size
-  const limit = req.query.pageSize || process.env.PAGE_SIZE || 10;
-
-  req.query.statut
-    ? conditions.push({ statut: QueryUtils.regexp(req.query.statut) })
-    : "";
-  req.query.nom
-    ? conditions.push({ "nomPrenom.nom": QueryUtils.regexp(req.query.nom) })
-    : "";
-  req.query.prenoms
-    ? conditions.push({
-        "nomPrenom.prenoms": QueryUtils.regexp(req.query.prenoms),
-      })
-    : "";
-
-  conditions.length === 0 ? conditions.push({}) : "";
-  console.log(conditions);
-
-  const searchConditions = {
-    $and: conditions,
-  };
+  const { searchConditions, page, limit } =
+    QueryRequest.handleQueryRequest(req);
 
   try {
     const personnes = await Personne.paginate(searchConditions, {

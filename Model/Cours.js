@@ -18,6 +18,7 @@ const CoursSchema = new Schema({
   },
   enseignant: { type: mongoose.Schema.Types.ObjectId, ref: "Personne" },
   closed: { type: Boolean, required: true, default: false },
+  factureId: { type: Number },
 });
 
 CoursSchema.plugin(mongoosePaginate);

@@ -2,8 +2,8 @@ const Enseignement = require("./../Model/Enseignement");
 const Personne = require("./../Model/Personne");
 const ResponseHandling = require("./../Utils/ResponseHandling");
 const MessageUtils = require("./../Utils/MessageUtils");
-const QueryUtils = require("./../Utils/QueryUtils");
 const moment = require("moment");
+const QueryRequest = require("./../Utils/QueryRequest");
 
 const createEnseignement = async (req, res) => {
   const enseignement = new Enseignement();
@@ -88,11 +88,10 @@ const importEnseignements = async (req, res) => {
 const getEnseignementById = async (req, res) => {
   const condition = { _id: req.params.id };
 
-  const enseignement = await Enseignement.findOne(condition).populate(
-    "enseignant"
-  );
-
   try {
+    const enseignement = await Enseignement.findOne(condition).populate(
+      "enseignant"
+    );
     return enseignement
       ? ResponseHandling.handleResponse(enseignement, res, MessageUtils.GET_OK)
       : ResponseHandling.handleNotFound(res);
@@ -102,34 +101,10 @@ const getEnseignementById = async (req, res) => {
 };
 
 const getEnseignements = async (req, res) => {
-  const conditions = [];
+  const { searchConditions, page, limit } =
+    QueryRequest.handleQueryRequest(req);
 
-  const page = req.query.page < 1 ? 1 : req.query.page || 1;
-  //page size
-  const limit = req.query.pageSize || process.env.PAGE_SIZE || 10;
-
-  req.query.anneeScolaire
-    ? conditions.push({ anneeScolaire: { $eq: req.query.anneeScolaire } })
-    : "";
-  req.query.matriculeEnseignant
-    ? conditions.push({ matricule: { $eq: req.query.matriculeEnseignant } })
-    : "";
-  req.query.niveauEnseigne
-    ? conditions.push({ niveauEnseigne: { $eq: req.query.niveauEnseigne } })
-    : "";
-  req.query.elementConstitutif
-    ? conditions.push({
-        elementConstitutif: { $eq: req.query.elementConstitutif },
-      })
-    : "";
-
-  conditions.length === 0 ? conditions.push({}) : "";
-
-  console.log(conditions);
-
-  const searchConditions = {
-    $and: conditions,
-  };
+  console.log(JSON.stringify(searchConditions));
 
   try {
     const enseignements = await Enseignement.paginate(searchConditions, {
@@ -160,8 +135,6 @@ const getEnseignements = async (req, res) => {
 
 const updateEnseignement = async (req, res) => {
   const condition = { _id: req.body._id };
-  const opts = { runValidators: true, new: true };
-
   const updatedEnseignement = req.body;
 
   try {
@@ -169,23 +142,18 @@ const updateEnseignement = async (req, res) => {
     if (req.body.matriculeEnseignant) {
       //Misy ve ny matriculeEnseignant?
 
-      try {
-        // try enseignant
-        const enseignant = await Personne.findOne({
-          // Mitady ilay enseignant amin'ny alalan'ilay matricule
-          matricule: req.body.matriculeEnseignant,
-        });
-        enseignant
-          ? (updatedEnseignement.enseignement = enseignant._id) // Raha hita ilay enseignant dia omena ny reference
-          : () => {
-              return ResponseHandling.handleNotFound(res); // Raha tsy hita ilay enseignant
-            };
-      } catch (e) {
-        //catch enseignant
-        return ResponseHandling.handleError(e, res, MessageUtils.ERROR);
-      }
+      const enseignant = await Personne.findOne({
+        // Mitady ilay enseignant amin'ny alalan'ilay matricule
+        matricule: req.body.matriculeEnseignant,
+      });
+      enseignant
+        ? (updatedEnseignement.enseignement = enseignant._id) // Raha hita ilay enseignant dia omena ny reference
+        : () => {
+            return ResponseHandling.handleNotFound(res); // Raha tsy hita ilay enseignant
+          };
     }
 
+    const opts = { runValidators: true, new: true };
     const enseignement = await Enseignement.findOneAndUpdate(
       condition,
       updatedEnseignement,

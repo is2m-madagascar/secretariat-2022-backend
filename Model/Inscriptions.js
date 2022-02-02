@@ -6,9 +6,10 @@ const { Schema } = mongoose;
 const required = [true, MessageUtils.REQUIRED];
 
 const InscriptionSchema = new Schema({
-  matricule: {
-    type: Number,
+  etudiant: {
+    type: mongoose.Schema.Types.ObjectId,
     required,
+    ref: "Personne",
   },
   dateInscription: {
     type: Date,
