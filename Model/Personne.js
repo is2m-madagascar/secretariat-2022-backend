@@ -22,6 +22,11 @@ const PersonneSchema = new Schema({
     type: String,
     required,
   },
+
+  grade: {
+    type: String,
+    default: null,
+  },
 });
 
 PersonneSchema.plugin(mongoosePaginate);

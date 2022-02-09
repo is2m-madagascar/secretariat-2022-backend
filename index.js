@@ -56,6 +56,8 @@ app.get("/cours", coursService.getCours);
 /* Facturation endpoints */
 app.get("/facture/:id", factureService.getFactureByID);
 app.get("/factures", factureService.getFactures);
+app.put("/facture/calculer/:id", factureService.calculerFacture);
+app.put("/facture/payer/:id", factureService.payerFacture);
 
 const port = process.env.APP_PORT || 8010;
 

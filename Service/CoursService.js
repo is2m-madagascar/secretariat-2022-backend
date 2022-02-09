@@ -114,7 +114,11 @@ const getCours = async (req, res) => {
     QueryRequest.handleQueryRequest(req);
 
   try {
-    const cours = await Cours.paginate(searchConditions, { limit, page });
+    const cours = await Cours.paginate(searchConditions, {
+      limit,
+      page,
+      populate: ["enseignement", "enseignant"],
+    });
 
     const message = {
       pagination: {
@@ -126,17 +130,7 @@ const getCours = async (req, res) => {
       statusMessage: MessageUtils.GET_OK,
     };
 
-    const newCours = await Promise.all(
-      cours.docs.map(async (element) => {
-        const cours = await Cours.findOne(element)
-          .populate("enseignement")
-          .populate("enseignant");
-
-        return cours;
-      })
-    );
-
-    return ResponseHandling.handleResponse(newCours, res, message);
+    return ResponseHandling.handleResponse(cours.docs, res, message);
   } catch (e) {
     return ResponseHandling.handleError(e, res, MessageUtils.ERROR);
   }

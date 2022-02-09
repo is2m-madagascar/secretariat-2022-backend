@@ -58,9 +58,9 @@ const importEnseignements = async (req, res) => {
       temp.volumeHoraire.minutes = duree.minutes();
 
       const enseignant = await Personne.findOne({
-        matricule: element.matriculeEnseignant,
+        matricule: element.enseignant,
       });
-      temp.enseignant = enseignant._id;
+      temp.enseignant = enseignant ? enseignant._id : null;
 
       enseignements.push(temp);
     })

@@ -3,13 +3,19 @@ const Cours = require("./../Model/Cours");
 const ResponseHandling = require("./../Utils/ResponseHandling");
 const MessageUtils = require("./../Utils/MessageUtils");
 const QueryRequest = require("./../Utils/QueryRequest");
+const Facture = require("./../Model/Facture");
+const moment = require("moment");
+const variablesService = require("./../Service/VariablesService");
 
 const getFactures = async (req, res) => {
   const { searchConditions, page, limit } =
     QueryRequest.handleQueryRequest(req);
 
   try {
-    const factures = await Cours.paginate(searchConditions, { page, limit });
+    const factures = await Facturation.paginate(searchConditions, {
+      page,
+      limit,
+    });
 
     const message = {
       pagination: {
@@ -62,8 +68,77 @@ const getFactureByID = async (req, res) => {
   }
 };
 
-const calculerFacture = (req, res) => {};
+const calculerFacture = async (req, res) => {
+  const condition = { _id: req.params.id };
+  const opts = { runValidators: true, new: true };
 
-const payerFacture = (req, res) => {};
+  try {
+    const facture = await Facture.findOne(condition)
+      .populate("cours")
+      .populate("enseignant");
+    if (!facture) {
+      return ResponseHandling.handleNotFound(res);
+    }
+
+    const volumeHoraire = [];
+    console.log(facture);
+
+    await Promise.all(
+      facture.cours.map(async (element) => {
+        const cours = await Cours.findOne({ _id: element._id }).populate(
+          "enseignement"
+        );
+
+        const niveau = cours.enseignement.niveauEnseigne;
+
+        const prix = volumeHoraire.push({
+          days: element.volumeConsomme.days || 0,
+          hours: element.volumeConsomme.hours || 0,
+          minutes: element.volumeConsomme.minutes || 0,
+          prix: 0,
+          niveau,
+        });
+      })
+    );
+
+    //TODO calcul
+
+    console.log(volumeHoraire);
+
+    console.log();
+
+    /*const updatedFacture = Facture.findOneAndUpdate(
+      condition,
+      { montantTotal },
+      opts
+    );*/
+
+    return ResponseHandling.handleResponse(facture, res, MessageUtils.PUT_OK);
+  } catch (e) {
+    ResponseHandling.handleError(e, res);
+  }
+};
+
+const payerFacture = async (req, res) => {
+  const condition = { _id: req.params.id };
+  const opts = { runValidators: true, new: true, populate: "cours" };
+
+  console.log(condition);
+
+  try {
+    const facture = await Facturation.findOneAndUpdate(
+      condition,
+      { payee: true },
+      opts
+    );
+
+    //const updatedFacture = await Facturation.findOne(condition);
+    return facture
+      ? ResponseHandling.handleResponse(facture, res, MessageUtils.PUT_OK)
+      : ResponseHandling.handleNotFound(res);
+  } catch (e) {
+    ResponseHandling.handleError(e, res);
+  }
+};
 
 module.exports = { getFactures, getFactureByID, payerFacture, calculerFacture };

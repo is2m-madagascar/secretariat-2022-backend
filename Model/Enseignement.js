@@ -28,12 +28,19 @@ const EnseignementSchema = new Schema({
     required,
     default: { days: 0, hours: 0, minutes: 0 },
   }, //15
+  semestre: { type: Number },
   enseignant: { type: mongoose.Schema.Types.ObjectId, ref: "Personne" },
 });
 
 EnseignementSchema.plugin(mongoosePaginate);
 EnseignementSchema.index(
-  { anneeScolaire: 1, matriculeEnseignant: 1, elementConstitutif: 1 },
+  {
+    anneeScolaire: 1,
+    matriculeEnseignant: 1,
+    elementConstitutif: 1,
+    "mention.code": 1,
+    "mention.specialisations": 1,
+  },
   { unique: true }
 );
 

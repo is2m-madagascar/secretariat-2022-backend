@@ -26,11 +26,19 @@ const createInscription = async (req, res) => {
     const etudiant = await Personne.findOne({ matricule: req.body.matricule });
 
     if (!etudiant) {
-      return ResponseHandling.handleError(err, res, "Etudiant not found");
+      return ResponseHandling.handleError(
+        "Etudiant not found",
+        res,
+        "Etudiant not found"
+      );
     }
 
-    if (etudiant.statut === "Etudiant") {
-      return ResponseHandling.handleError(err, res, "Personne is not student");
+    if (etudiant.statut !== "Etudiant") {
+      return ResponseHandling.handleError(
+        "Not a student",
+        res,
+        "Personne is not student"
+      );
     }
 
     inscription.etudiant = etudiant._id;
@@ -74,6 +82,7 @@ const paginateInscriptions = async (req, res) => {
     const inscription = await Inscription.paginate(searchConditions, {
       limit,
       page,
+      populate: "etudiant",
     });
 
     const message = {
@@ -86,14 +95,8 @@ const paginateInscriptions = async (req, res) => {
       statusMessage: MessageUtils.GET_OK,
     };
 
-    const newInsc = await Promise.all(
-      inscription.docs.map(async (element) => {
-        await element.populate("etudiant");
-      })
-    );
-
     return inscription
-      ? ResponseHandling.handleResponse(newInsc, res, message)
+      ? ResponseHandling.handleResponse(inscription.docs, res, message)
       : ResponseHandling.handleNotFound(res);
   } catch (e) {
     return ResponseHandling.handleError(e, res, MessageUtils.ERROR);

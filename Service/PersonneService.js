@@ -9,6 +9,7 @@ const createPersonne = async (req, res) => {
   personne.matricule = req.body.matricule;
   personne.nomPrenom = req.body.nomPrenom;
   personne.statut = req.body.statut;
+  personne.grade = req.body.grade || null;
 
   console.log("Personne reçu");
   console.log(personne);
@@ -37,6 +38,8 @@ const getPersonne = async (req, res) => {
 const paginatePersonnes = async (req, res) => {
   const { searchConditions, page, limit } =
     QueryRequest.handleQueryRequest(req);
+
+  console.log(searchConditions);
 
   try {
     const personnes = await Personne.paginate(searchConditions, {

@@ -1,3 +1,5 @@
+const QueryUtils = require("./QueryUtils");
+
 const handleQueryRequest = (req) => {
   const conditions = [];
 
@@ -9,10 +11,15 @@ const handleQueryRequest = (req) => {
 
   queries.forEach((element) => {
     const keyValue = {};
-    keyValue[element] = req.query[element];
 
-    //(page XOR pageSize)
+    if (/^\d/.test(req.query[element])) {
+      keyValue[element] = req.query[element];
+    } else {
+      keyValue[element] = QueryUtils.regexp(req.query[element]);
+    }
+
     if (((element !== "page") ^ (element !== "pageSize")) === 0) {
+      //(page XOR pageSize)
       conditions.push(keyValue);
     }
   });
@@ -22,6 +29,8 @@ const handleQueryRequest = (req) => {
   const searchConditions = {
     $and: conditions,
   };
+
+  console.log(searchConditions);
 
   return { searchConditions, page, limit };
 };
