@@ -18,6 +18,7 @@ const createEnseignement = async (req, res) => {
   enseignement.volumeHoraire.days = duree.days();
   enseignement.volumeHoraire.hours = duree.hours();
   enseignement.volumeHoraire.minutes = duree.minutes();
+  enseignement.semestre = req.body.semestre;
 
   //enseignement.matriculeEnseignant = req.body.matriculeEnseignant;
 
@@ -56,6 +57,7 @@ const importEnseignements = async (req, res) => {
       temp.volumeHoraire.days = duree.days();
       temp.volumeHoraire.hours = duree.hours();
       temp.volumeHoraire.minutes = duree.minutes();
+      temp.semestre = element.semestre;
 
       const enseignant = await Personne.findOne({
         matricule: element.enseignant,
@@ -110,6 +112,7 @@ const getEnseignements = async (req, res) => {
     const enseignements = await Enseignement.paginate(searchConditions, {
       page,
       limit,
+      sort: { semestre: 1 },
     });
 
     const message = {

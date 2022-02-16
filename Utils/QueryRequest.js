@@ -12,7 +12,11 @@ const handleQueryRequest = (req) => {
   queries.forEach((element) => {
     const keyValue = {};
 
-    if (/^\d/.test(req.query[element])) {
+    if (
+      /^\d/.test(req.query[element]) ||
+      req.query[element] === "true" ||
+      req.query[element] === "false"
+    ) {
       keyValue[element] = req.query[element];
     } else {
       keyValue[element] = QueryUtils.regexp(req.query[element]);
@@ -29,8 +33,6 @@ const handleQueryRequest = (req) => {
   const searchConditions = {
     $and: conditions,
   };
-
-  console.log(searchConditions);
 
   return { searchConditions, page, limit };
 };

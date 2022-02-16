@@ -45,6 +45,7 @@ const paginatePersonnes = async (req, res) => {
     const personnes = await Personne.paginate(searchConditions, {
       page,
       limit,
+      sort: { _id: -1 },
     });
     const message = {
       pagination: {

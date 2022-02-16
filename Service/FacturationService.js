@@ -4,8 +4,6 @@ const ResponseHandling = require("./../Utils/ResponseHandling");
 const MessageUtils = require("./../Utils/MessageUtils");
 const QueryRequest = require("./../Utils/QueryRequest");
 const Facture = require("./../Model/Facture");
-const moment = require("moment");
-const variablesService = require("./../Service/VariablesService");
 
 const getFactures = async (req, res) => {
   const { searchConditions, page, limit } =
@@ -15,6 +13,8 @@ const getFactures = async (req, res) => {
     const factures = await Facturation.paginate(searchConditions, {
       page,
       limit,
+      sort: { _id: -1 },
+      populate: ['enseignant', 'cours']
     });
 
     const message = {
@@ -70,7 +70,6 @@ const getFactureByID = async (req, res) => {
 
 const calculerFacture = async (req, res) => {
   const condition = { _id: req.params.id };
-  const opts = { runValidators: true, new: true };
 
   try {
     const facture = await Facture.findOne(condition)
@@ -102,10 +101,7 @@ const calculerFacture = async (req, res) => {
     );
 
     //TODO calcul
-
     console.log(volumeHoraire);
-
-    console.log();
 
     /*const updatedFacture = Facture.findOneAndUpdate(
       condition,

@@ -43,6 +43,6 @@ const InscriptionSchema = new Schema({
 });
 
 InscriptionSchema.plugin(mongoosePaginate);
-InscriptionSchema.index({ anneeScolaire: 1, matricule: 1 }, { unique: true });
+InscriptionSchema.index({ anneeScolaire: 1, etudiant: 1 }, { unique: true });
 
 module.exports = mongoose.model("Inscription", InscriptionSchema);

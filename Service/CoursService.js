@@ -19,6 +19,8 @@ const ouvrirCours = async (req, res) => {
 
   const cours = await Cours.findOne(condition).populate("enseignement");
 
+  console.log(cours)
+
   if (!cours) {
     try {
       const enseignement = await Enseignement.findOne({
@@ -28,7 +30,7 @@ const ouvrirCours = async (req, res) => {
         return ResponseHandling.handleNotFound(res);
       }
 
-      newCours.enseignant = enseignement._id;
+      newCours.enseignant = enseignement.enseignant._id || enseignement.enseignant;
 
       //TODO transactions
       const { cours, facture } =
@@ -41,7 +43,7 @@ const ouvrirCours = async (req, res) => {
         .populate("enseignement")
         .populate("enseignant");
 
-      //console.log({ cours, facture });
+      console.log({ cours, facture });
 
       return ResponseHandling.handleResponse(
         showCours,
@@ -117,6 +119,7 @@ const getCours = async (req, res) => {
     const cours = await Cours.paginate(searchConditions, {
       limit,
       page,
+      sort: { _id: -1 },
       populate: ["enseignement", "enseignant"],
     });
 

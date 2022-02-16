@@ -83,6 +83,7 @@ const paginateInscriptions = async (req, res) => {
       limit,
       page,
       populate: "etudiant",
+      sort: { _id: -1 },
     });
 
     const message = {
