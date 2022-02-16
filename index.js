@@ -61,7 +61,7 @@ app.put("/facture/payer/:id", factureService.payerFacture);
 
 const port = process.env.APP_PORT || 8080;
 
-app.listen(port, () => {
+app.listen(port, "0.0.0.0", () => {
   console.log(`Application démarré sur le port ${port}`);
 });
 
