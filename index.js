@@ -1,5 +1,5 @@
 const express = require("express");
-//const dotenv = require("dotenv");
+const dotenv = require("dotenv");
 const database = require("./Config/DatabaseConnection");
 const QueryUtils = require("./Utils/QueryUtils");
 const variablesService = require("./Service/VariablesService");
@@ -12,7 +12,7 @@ const factureService = require("./Service/FacturationService");
 
 /* config app*/
 const app = express();
-//dotenv.config();
+dotenv.config();
 
 app.use(QueryUtils.setCorsPolicy);
 app.use(express.urlencoded({ extended: true }));
@@ -59,7 +59,7 @@ app.get("/factures", factureService.getFactures);
 app.put("/facture/calculer/:id", factureService.calculerFacture);
 app.put("/facture/payer/:id", factureService.payerFacture);
 
-const port = process.env.APP_PORT;
+const port = process.env.APP_PORT || 8080;
 
 app.listen(port, () => {
   console.log(`Application démarré sur le port ${port}`);
