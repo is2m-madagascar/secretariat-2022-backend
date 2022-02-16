@@ -59,7 +59,7 @@ app.get("/factures", factureService.getFactures);
 app.put("/facture/calculer/:id", factureService.calculerFacture);
 app.put("/facture/payer/:id", factureService.payerFacture);
 
-const port = process.env.APP_PORT || 80;
+const port = process.env.APP_PORT;
 
 app.listen(port, () => {
   console.log(`Application démarré sur le port ${port}`);
