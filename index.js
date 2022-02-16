@@ -12,7 +12,7 @@ const factureService = require("./Service/FacturationService");
 
 /* config app*/
 const app = express();
-dotenv.config();
+//dotenv.config();
 
 app.use(QueryUtils.setCorsPolicy);
 app.use(express.urlencoded({ extended: true }));
