@@ -1,30 +1,32 @@
 const Personne = require("../Model/Personne");
 const ResponseHandling = require("../Utils/ResponseHandling");
 const MessageUtils = require("../Utils/MessageUtils");
-const QueryRequest = require("./../Utils/QueryRequest");
+const { handleQueryRequest } = require("./../Utils/QueryRequest");
 
 const createPersonne = async (req, res) => {
   const personne = new Personne();
-
   personne.matricule = req.body.matricule;
   personne.nomPrenom = req.body.nomPrenom;
   personne.statut = req.body.statut;
+  personne.contacts = req.body.contacts;
+  personne.adress = req.body.adress;
   personne.grade = req.body.grade || null;
-
+  personne.parents = req.body.parents;
+  personne.diplome = req.body.diplome;
+  personne.sexeM = req.body.sexeM;
+  personne.photoAdress = req.body.photoAdress || null;
   console.log("Personne reçu");
   console.log(personne);
-
   try {
     await personne.save();
     return ResponseHandling.handleResponse(personne, res, MessageUtils.POST_OK);
   } catch (e) {
-    return ResponseHandling.handleError(e, res, MessageUtils.ERROR);
+    return ResponseHandling.handleError(e, res);
   }
 };
 
 const getPersonne = async (req, res) => {
   const condition = { matricule: req.params.matricule };
-
   try {
     const personne = await Personne.findOne(condition);
     return personne
@@ -36,11 +38,8 @@ const getPersonne = async (req, res) => {
 };
 
 const paginatePersonnes = async (req, res) => {
-  const { searchConditions, page, limit } =
-    QueryRequest.handleQueryRequest(req);
-
+  const { searchConditions, page, limit } = handleQueryRequest(req);
   console.log(searchConditions);
-
   try {
     const personnes = await Personne.paginate(searchConditions, {
       page,
@@ -56,7 +55,6 @@ const paginatePersonnes = async (req, res) => {
       },
       statusMessage: MessageUtils.GET_OK,
     };
-
     return personnes
       ? ResponseHandling.handleResponse(personnes.docs, res, message)
       : ResponseHandling.handleNotFound(res);
@@ -68,9 +66,14 @@ const paginatePersonnes = async (req, res) => {
 const updatePersonne = async (req, res) => {
   const condition = { matricule: req.body.matricule };
   const opts = { runValidators: true, new: true };
-
+  const personneToUpdate = req.body;
+  personneToUpdate.lastUpdated = new Date();
   try {
-    const personne = await Personne.findOneAndUpdate(condition, req.body, opts);
+    const personne = await Personne.findOneAndUpdate(
+      condition,
+      personneToUpdate,
+      opts
+    );
     return personne
       ? ResponseHandling.handleResponse(personne, res, MessageUtils.PUT_OK)
       : ResponseHandling.handleNotFound(res);
@@ -81,7 +84,6 @@ const updatePersonne = async (req, res) => {
 
 const deletePersonne = async (req, res) => {
   const condition = { matricule: req.params.matricule };
-
   try {
     const personne = await Personne.findOneAndDelete(condition);
     return personne

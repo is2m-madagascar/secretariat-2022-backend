@@ -11,34 +11,34 @@ const InscriptionSchema = new Schema({
     required,
     ref: "Personne",
   },
+
   dateInscription: {
     type: Date,
     required,
   },
+
   anneeScolaire: {
     type: Number,
     required,
   },
-  niveau: { type: String, required },
-  mention: { type: { mention: String, code: String, specialisation: String } },
-  ecolage: {
-    type: {
-      montantTotal: {
-        type: {
-          fraisInsc: { type: Number },
-          fraisFormation: { type: Number },
-        },
-      },
-      paiementsEffectues: {
-        type: [
-          {
-            montant: { type: [Number] },
-            datePaiement: { type: Date },
-            motif: { type: [String] },
-          },
-        ],
-      },
-    },
+
+  niveau: { type: mongoose.Schema.Types.ObjectId, ref: "Niveau" },
+
+  mention: {
+    type: mongoose.Schema.Types.ObjectId,
+    required,
+    ref: "Mention",
+  },
+
+  paiements: {
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Paiement" }],
+    required,
+    default: [],
+  },
+
+  promotion: {
+    type: Number,
+    default: 0,
   },
 });
 

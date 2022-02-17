@@ -9,6 +9,8 @@ const ecolageService = require("./Service/EcolageService");
 const enseignementService = require("./Service/EnseignementService");
 const coursService = require("./Service/CoursService");
 const factureService = require("./Service/FacturationService");
+const niveauService = require("./Service/NiveauService");
+const mentionService = require("./Service/MentionService");
 
 /* config app*/
 const app = express();
@@ -58,6 +60,18 @@ app.get("/facture/:id", factureService.getFactureByID);
 app.get("/factures", factureService.getFactures);
 app.put("/facture/calculer/:id", factureService.calculerFacture);
 app.put("/facture/payer/:id", factureService.payerFacture);
+
+/* Niveaux endpoint */
+app.post("/niveau", niveauService.createNiveau);
+app.put("/niveau/:niveau", niveauService.updateMontant);
+app.get("/niveaux", niveauService.getNiveaux);
+
+/* Mention endpoint*/
+app.post("/mention", mentionService.createMention);
+app.put("/mention/:code", mentionService.updateMention);
+app.put("/mention/addSpec/:code", mentionService.addSpecToMention);
+app.put("/mention/addSpecs/:code", mentionService.addSpecsToMention);
+app.get("/mentions", mentionService.getMention);
 
 const port = process.env.PORT || 8080;
 

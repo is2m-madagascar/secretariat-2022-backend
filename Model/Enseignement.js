@@ -7,18 +7,18 @@ const required = [true, MessageUtils.REQUIRED];
 
 const EnseignementSchema = new Schema({
   anneeScolaire: { type: Number, required }, // 2021
+
   niveauEnseigne: { type: String, required }, // L1
+
   mention: {
-    type: [
-      {
-        mention: { type: String },
-        code: { type: String },
-        specialisations: { type: String },
-      },
-    ],
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Mention" }],
     required,
   }, // MI
-  elementConstitutif: { type: String, required }, // Algebre 1
+
+  elementConstitutif: { type: { code: String, ec: String }, required }, // Algebre 1
+
+  uniteEnseignement: { type: { code: String, ue: String }, required },
+
   volumeHoraire: {
     type: {
       days: { type: Number, default: 0 },
@@ -36,10 +36,8 @@ EnseignementSchema.plugin(mongoosePaginate);
 EnseignementSchema.index(
   {
     anneeScolaire: 1,
-    matriculeEnseignant: 1,
+    enseignant: 1,
     elementConstitutif: 1,
-    "mention.code": 1,
-    "mention.specialisations": 1,
   },
   { unique: true }
 );

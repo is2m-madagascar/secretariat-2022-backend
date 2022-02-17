@@ -7,14 +7,19 @@ const required = [true, MessageUtils.REQUIRED];
 
 const FacturationSchema = new Schema({
   anneeScolaire: { type: Number, required },
+
   enseignant: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Personne",
     required,
   },
+
   mois: { type: Number, required },
+
   montantTotal: { type: Number, required, default: 0 },
+
   cours: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Cours" }] },
+
   payee: { type: Boolean, default: false },
 });
 
