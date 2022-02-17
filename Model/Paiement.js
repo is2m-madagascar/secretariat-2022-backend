@@ -9,11 +9,14 @@ const PaiementSchema = new Schema({
   personne: { type: mongoose.Schema.Types.ObjectId, required, ref: "Personne" },
   montant: { type: Number },
   datePaiement: { type: Date, default: new Date() },
-  motif: { type: String },
-  sens: { type: Boolean, required },
-  anneeScolaire: { type: Number, required },
+  motif: { type: [String] },
+  inscription: {
+    type: mongoose.Schema.Types.ObjectId,
+    required,
+    ref: "Inscription",
+  },
 });
 
-MentionSchema.plugin(mongoosePaginate);
+PaiementSchema.plugin(mongoosePaginate);
 
 module.exports = mongoose.model("Paiement", PaiementSchema);

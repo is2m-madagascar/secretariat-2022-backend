@@ -15,6 +15,7 @@ const InscriptionSchema = new Schema({
   dateInscription: {
     type: Date,
     required,
+    default: new Date(),
   },
 
   anneeScolaire: {
@@ -22,12 +23,16 @@ const InscriptionSchema = new Schema({
     required,
   },
 
-  niveau: { type: mongoose.Schema.Types.ObjectId, ref: "Niveau" },
+  niveau: { type: mongoose.Schema.Types.ObjectId, ref: "Niveau", required },
 
   mention: {
     type: mongoose.Schema.Types.ObjectId,
     required,
     ref: "Mention",
+  },
+
+  codeSpecialisati: {
+    type: String,
   },
 
   paiements: {

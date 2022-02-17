@@ -2,10 +2,9 @@ const express = require("express");
 const dotenv = require("dotenv");
 const database = require("./Config/DatabaseConnection");
 const QueryUtils = require("./Utils/QueryUtils");
-const variablesService = require("./Service/VariablesService");
 const personneService = require("./Service/PersonneService");
 const inscriptionService = require("./Service/InscriptionService");
-const ecolageService = require("./Service/EcolageService");
+const paiementService = require("./Service/PaiementService");
 const enseignementService = require("./Service/EnseignementService");
 const coursService = require("./Service/CoursService");
 const factureService = require("./Service/FacturationService");
@@ -23,9 +22,6 @@ app.use(express.json());
 /* Connect to mongodb*/
 database.connectToMongo();
 
-/* Variables */
-app.get("/variables/:variable", variablesService.getVariables);
-
 /* Personne endpoints */
 app.post("/personne", personneService.createPersonne);
 app.get("/personne/:matricule", personneService.getPersonne);
@@ -39,8 +35,12 @@ app.get("/inscription/:id", inscriptionService.getInscriptionByID);
 app.get("/inscriptions", inscriptionService.paginateInscriptions);
 app.delete("/inscription/:id", inscriptionService.deleteInscription);
 
-/* Ecolage endpoints */
-app.put("/inscription/payerEcolage/:id", ecolageService.payerEcolage);
+/* Paiements endpoints */
+app.get("/paiements", paiementService.paginatePaiements);
+app.put(
+  "/inscription/paiement/:idInscription",
+  paiementService.effectuerPaiement
+);
 
 /* Enseignement endpoints*/
 app.post("/enseignement", enseignementService.createEnseignement);
