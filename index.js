@@ -48,6 +48,8 @@ app.post("/enseignements", enseignementService.importEnseignements);
 app.get("/enseignement/:id", enseignementService.getEnseignementById);
 app.get("/enseignements", enseignementService.getEnseignements);
 app.put("/enseignement", enseignementService.updateEnseignement);
+app.put("/enseignement/cours/:idEns", enseignementService.addCoursToEns);
+app.put("/enseignement/closeCours/:idEns", enseignementService.closeCours);
 
 /* Cours endpoints */
 app.post("/cours", coursService.ouvrirCours);

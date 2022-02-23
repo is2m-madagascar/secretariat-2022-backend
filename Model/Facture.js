@@ -14,11 +14,9 @@ const FacturationSchema = new Schema({
     required,
   },
 
-  mois: { type: Number, required },
-
   montantTotal: { type: Number, required, default: 0 },
 
-  cours: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Cours" }] },
+  cours: { type: [mongoose.Schema.Types.ObjectId], ref: "Cours" },
 
   payee: { type: Boolean, default: false },
 });

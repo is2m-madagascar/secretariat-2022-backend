@@ -7,18 +7,17 @@ const required = [true, MessageUtils.REQUIRED];
 
 const EnseignementSchema = new Schema({
   anneeScolaire: { type: Number, required }, // 2021
-
-  niveauEnseigne: { type: String, required }, // L1
-
+  niveauEnseigne: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Niveau",
+    required,
+  }, // L1
   mention: {
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Mention" }],
     required,
   }, // MI
-
   elementConstitutif: { type: { code: String, ec: String }, required }, // Algebre 1
-
   uniteEnseignement: { type: { code: String, ue: String }, required },
-
   volumeHoraire: {
     type: {
       days: { type: Number, default: 0 },
@@ -28,6 +27,12 @@ const EnseignementSchema = new Schema({
     required,
     default: { days: 0, hours: 0, minutes: 0 },
   }, //15
+  volumeConsomme: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: "Cours",
+    required,
+    default: [],
+  },
   semestre: { type: Number },
   enseignant: { type: mongoose.Schema.Types.ObjectId, ref: "Personne" },
 });
@@ -37,7 +42,7 @@ EnseignementSchema.index(
   {
     anneeScolaire: 1,
     enseignant: 1,
-    elementConstitutif: 1,
+    "elementConstitutif.code": 1,
   },
   { unique: true }
 );

@@ -8,6 +8,9 @@ const handleError = (err, res, message) => {
     message: message || MessageUtils.ERROR,
   });
   console.log(response);
+  try {
+    console.log(err.line);
+  } catch (e) {}
   return res.status(500).json(response);
 };
 

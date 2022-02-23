@@ -14,7 +14,7 @@ const getFactures = async (req, res) => {
       page,
       limit,
       sort: { _id: -1 },
-      populate: ['enseignant', 'cours']
+      populate: ["enseignant", "cours"],
     });
 
     const message = {
@@ -71,10 +71,16 @@ const getFactureByID = async (req, res) => {
 const calculerFacture = async (req, res) => {
   const condition = { _id: req.params.id };
 
+  //niveauEns = Master *2
+  //Grade ens = samihafa
+
   try {
-    const facture = await Facture.findOne(condition)
-      .populate("cours")
-      .populate("enseignant");
+    //Chercher la facture à calculer
+    const facture = await Facture.findOne(condition, null, {
+      populate: ["cours", "enseignant"],
+    });
+
+    //Si aucune facture ne correspond
     if (!facture) {
       return ResponseHandling.handleNotFound(res);
     }
@@ -83,7 +89,7 @@ const calculerFacture = async (req, res) => {
     console.log(facture);
 
     await Promise.all(
-      facture.cours.map(async (element) => {
+      /*facture.cours.map(async (element) => {
         const cours = await Cours.findOne({ _id: element._id }).populate(
           "enseignement"
         );
@@ -97,7 +103,8 @@ const calculerFacture = async (req, res) => {
           prix: 0,
           niveau,
         });
-      })
+      })*/
+
     );
 
     //TODO calcul

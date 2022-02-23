@@ -2,6 +2,12 @@ const Facture = require("./../Model/Facture");
 const Cours = require("./../Model/Cours");
 const ResponseHandling = require("./../Utils/ResponseHandling");
 
+/**
+ * Insérer un cours dans une facture puis calculer le montant total de la facture
+ * @param {*} newCours
+ * @param {*} req
+ * @returns
+ */
 const createFactureAndCours = async (newCours, req) => {
   const anneeScolaire = req.body.anneeScolaire;
   const enseignant = newCours.enseignant;

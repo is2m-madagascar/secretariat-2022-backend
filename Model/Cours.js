@@ -6,25 +6,21 @@ const { Schema } = mongoose;
 const required = [true, MessageUtils.REQUIRED];
 
 const CoursSchema = new Schema({
-  enseignement: { type: mongoose.Schema.Types.ObjectId, ref: "Enseignement" },
-
-  debut: { type: Date, default: new Date(), required },
-
-  fin: { type: Date },
-
   volumeConsomme: {
     type: {
-      days: { type: Number },
-      hours: { type: Number },
+      days: { type: Number, default: 0 },
+      hours: { type: Number, default: 0 },
       minutes: { type: Number, default: 0 },
     },
+    required,
+    default: { days: 0, hours: 0, minutes: 0 },
   },
-
-  enseignant: { type: mongoose.Schema.Types.ObjectId, ref: "Personne" },
-  
-  facture: { type: mongoose.Schema.Types.ObjectId, ref: "Facture" },
-
-  closed: { type: Boolean, required: true, default: false },
+  dateHeureDebut: { type: Date, default: new Date(), required },
+  dateHeureFin: { type: Date },
+  description: { type: [String] },
+  remarques: { type: [String] },
+  absences: { type: [String] },
+  enseignement: {type: mongoose.Schema.Types.ObjectId, ref: "Enseignement"}
 });
 
 CoursSchema.plugin(mongoosePaginate);
