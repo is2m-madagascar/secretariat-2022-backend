@@ -88,33 +88,8 @@ const calculerFacture = async (req, res) => {
     const volumeHoraire = [];
     console.log(facture);
 
-    await Promise.all(
-      /*facture.cours.map(async (element) => {
-        const cours = await Cours.findOne({ _id: element._id }).populate(
-          "enseignement"
-        );
-
-        const niveau = cours.enseignement.niveauEnseigne;
-
-        const prix = volumeHoraire.push({
-          days: element.volumeConsomme.days || 0,
-          hours: element.volumeConsomme.hours || 0,
-          minutes: element.volumeConsomme.minutes || 0,
-          prix: 0,
-          niveau,
-        });
-      })*/
-
-    );
-
     //TODO calcul
     console.log(volumeHoraire);
-
-    /*const updatedFacture = Facture.findOneAndUpdate(
-      condition,
-      { montantTotal },
-      opts
-    );*/
 
     return ResponseHandling.handleResponse(facture, res, MessageUtils.PUT_OK);
   } catch (e) {

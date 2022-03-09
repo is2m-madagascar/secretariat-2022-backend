@@ -52,6 +52,8 @@ const paginateInscriptions = async (req, res) => {
   const { searchConditions, page, limit } =
     QueryRequest.handleQueryRequest(req);
 
+  console.log(searchConditions);
+
   try {
     const inscription = await Inscription.paginate(searchConditions, {
       limit,

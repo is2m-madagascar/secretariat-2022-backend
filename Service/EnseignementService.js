@@ -97,7 +97,7 @@ const importEnseignements = async (req, res) => {
     return ResponseHandling.handleError(e, res, MessageUtils.ERROR);
   }
 };
-
+  
 const getEnseignementById = async (req, res) => {
   const condition = { _id: req.params.id };
 
