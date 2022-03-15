@@ -96,6 +96,11 @@ const PersonneSchema = new Schema({
   lastUpdated: {
     type: Date,
   },
+
+  photoUrl: {
+    type: String,
+    default: "https://material.angular.io/assets/img/examples/shiba1.jpg",
+  },
 });
 
 PersonneSchema.plugin(mongoosePaginate);
