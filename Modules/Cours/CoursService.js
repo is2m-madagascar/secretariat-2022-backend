@@ -1,10 +1,10 @@
-const Cours = require("./../Model/Cours");
-const facturationRepository = require("./../Repository/FacturationRepository");
-const Enseignement = require("./../Model/Enseignement");
-const ResponseHandling = require("./../Utils/ResponseHandling");
-const MessageUtils = require("./../Utils/MessageUtils");
+const Cours = require("./Cours");
+const facturationRepository = require("../Factures/FacturationRepository");
+const Enseignement = require("../Enseignements/Enseignement");
+const ResponseHandling = require("../../Utils/ResponseHandling");
+const MessageUtils = require("../../Utils/MessageUtils");
 const moment = require("moment");
-const QueryRequest = require("./../Utils/QueryRequest");
+const QueryRequest = require("../../Utils/QueryRequest");
 
 const ouvrirCours = async (req, res) => {
   const newCours = new Cours();

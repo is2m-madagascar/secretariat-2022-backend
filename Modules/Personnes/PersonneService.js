@@ -1,7 +1,7 @@
-const Personne = require("../Model/Personne");
-const ResponseHandling = require("../Utils/ResponseHandling");
-const MessageUtils = require("../Utils/MessageUtils");
-const { handleQueryRequest } = require("./../Utils/QueryRequest");
+const Personne = require("./Personne");
+const ResponseHandling = require("../../Utils/ResponseHandling");
+const MessageUtils = require("../../Utils/MessageUtils");
+const { handleQueryRequest } = require("../../Utils/QueryRequest");
 
 const createPersonne = async (req, res) => {
   const personne = new Personne();

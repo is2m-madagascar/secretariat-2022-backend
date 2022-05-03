@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const mongoosePaginate = require("mongoose-paginate");
-const MessageUtils = require("./../Utils/MessageUtils");
+const MessageUtils = require("../../Utils/MessageUtils");
 
 const { Schema } = mongoose;
 const required = [true, MessageUtils.require];
@@ -33,7 +33,7 @@ const PersonneSchema = new Schema({
     default: null,
   },
 
-  //email, phone, etc
+  //email, phone, facebook
   contacts: {
     type: [{ contactType: String, contactValue: String }],
     required,
@@ -41,9 +41,9 @@ const PersonneSchema = new Schema({
   },
 
   adress: {
-    type: [String],
+    type: String,
     required,
-    default: [],
+    default: '',
   },
 
   parents: {
@@ -51,7 +51,6 @@ const PersonneSchema = new Schema({
       {
         nom: { type: String },
         prenoms: { type: String },
-        sexeM: { type: Boolean },
         email: { type: String },
         phones: { type: [String] },
         relation: { type: String },
@@ -76,7 +75,6 @@ const PersonneSchema = new Schema({
       {
         designation: String,
         mention: String,
-        equivalence: String,
         anneeObt: Number,
       },
     ],

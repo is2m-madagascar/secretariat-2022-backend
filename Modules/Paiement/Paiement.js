@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const mongoosePaginate = require("mongoose-paginate");
-const MessageUtils = require("./../Utils/MessageUtils");
+const MessageUtils = require("../../Utils/MessageUtils");
 
 const { Schema } = mongoose;
 const required = [true, MessageUtils.require];
