@@ -13,10 +13,6 @@ const PersonneSchema = new Schema({
     min: 1,
   },
 
-  photoAdress: {
-    type: String,
-  },
-
   nomPrenom: {
     type: { nom: String, prenoms: String },
     required,
@@ -97,7 +93,7 @@ const PersonneSchema = new Schema({
     type: Date,
   },
 
-  photoUrl: {
+  photoAdress: {
     type: String,
     default: "https://material.angular.io/assets/img/examples/shiba1.jpg",
   },
