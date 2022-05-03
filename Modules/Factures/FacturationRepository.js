@@ -1,6 +1,6 @@
-const Facture = require("./../Model/Facture");
-const Cours = require("./../Model/Cours");
-const ResponseHandling = require("./../Utils/ResponseHandling");
+const Facture = require("./Facture");
+const Cours = require("../Cours/Cours");
+const ResponseHandling = require("../../Utils/ResponseHandling");
 
 const createFactureAndCours = async (newCours, req) => {
   const anneeScolaire = req.body.anneeScolaire;

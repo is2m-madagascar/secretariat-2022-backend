@@ -1,9 +1,9 @@
-const Enseignement = require("./../Model/Enseignement");
-const Personne = require("./../Model/Personne");
-const ResponseHandling = require("./../Utils/ResponseHandling");
-const MessageUtils = require("./../Utils/MessageUtils");
+const Enseignement = require("./Enseignement");
+const Personne = require("../Personnes/Personne");
+const ResponseHandling = require("../../Utils/ResponseHandling");
+const MessageUtils = require("../../Utils/MessageUtils");
 const moment = require("moment");
-const QueryRequest = require("./../Utils/QueryRequest");
+const QueryRequest = require("../../Utils/QueryRequest");
 
 const createEnseignement = async (req, res) => {
   const enseignement = new Enseignement();

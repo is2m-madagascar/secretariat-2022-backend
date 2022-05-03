@@ -16,9 +16,6 @@ const getVariables = (req, res) => {
     case "mentions":
       return makeResponse(Variables.mentions, res);
 
-    case "fraisScolarite":
-      return makeResponse(Variables.fraisScolarite, res);
-
     case "fraisInscription":
       return makeResponse(Variables.fraisInscription, res);
 

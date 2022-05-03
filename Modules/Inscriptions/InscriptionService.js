@@ -1,29 +1,29 @@
-const Inscription = require("./../Model/Inscriptions");
-const Personne = require("./../Model/Personne");
-const ResponseHandling = require("./../Utils/ResponseHandling");
-const MessageUtils = require("./../Utils/MessageUtils");
-const variables = require("./../Config/Variables");
-const QueryRequest = require("./../Utils/QueryRequest");
+const Inscription = require("./Inscriptions");
+const Personne = require("../Personnes/Personne");
+const ResponseHandling = require("../../Utils/ResponseHandling");
+const MessageUtils = require("../../Utils/MessageUtils");
+const QueryRequest = require("../../Utils/QueryRequest");
 
 const createInscription = async (req, res) => {
   const inscription = new Inscription();
 
   //inscription.matricule = req.body.matricule;
+  inscription.etudiant = req.body.etudiant_id;
   inscription.dateInscription = new Date();
   inscription.anneeScolaire = req.body.anneeScolaire;
   inscription.niveau = req.body.niveau;
   inscription.mention = req.body.mention;
-  inscription.ecolage = {
+  /*inscription.ecolage = {
     montantTotal: {
       fraisInsc: variables.fraisInscription,
       fraisFormation: variables.fraisScolarite[inscription.niveau],
     },
     paiementsEffectues: [],
-  };
+  };*/
   console.log("Inscription reçu");
   console.log(inscription);
   try {
-    const etudiant = await Personne.findOne({ matricule: req.body.matricule });
+    const etudiant = await Personne.findOne({ _id: req.body.etudiant_id });
 
     if (!etudiant) {
       return ResponseHandling.handleError(

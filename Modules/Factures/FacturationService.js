@@ -1,9 +1,9 @@
-const Facturation = require("./../Model/Facture");
-const Cours = require("./../Model/Cours");
-const ResponseHandling = require("./../Utils/ResponseHandling");
-const MessageUtils = require("./../Utils/MessageUtils");
-const QueryRequest = require("./../Utils/QueryRequest");
-const Facture = require("./../Model/Facture");
+const Facturation = require("./Facture");
+const Cours = require("../Cours/Cours");
+const ResponseHandling = require("../../Utils/ResponseHandling");
+const MessageUtils = require("../../Utils/MessageUtils");
+const QueryRequest = require("../../Utils/QueryRequest");
+const Facture = require("./Facture");
 
 const getFactures = async (req, res) => {
   const { searchConditions, page, limit } =

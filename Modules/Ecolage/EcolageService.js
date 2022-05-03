@@ -1,6 +1,6 @@
-const Inscription = require("./../Model/Inscriptions");
-const ResponseHandling = require("./../Utils/ResponseHandling");
-const MessageUtils = require("./../Utils/MessageUtils");
+const Inscription = require("../Inscriptions/Inscriptions");
+const ResponseHandling = require("../../Utils/ResponseHandling");
+const MessageUtils = require("../../Utils/MessageUtils");
 
 const payerEcolage = async (req, res) => {
   const condition = { _id: req.params.id };
